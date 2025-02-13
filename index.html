@@ -34,50 +34,60 @@
     <canvas id="outputCanvas"></canvas>
 
     <script>
+        const canvas = document.getElementById("outputCanvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = 750;
+        canvas.height = 1050;
+
         const template = new Image();
-        template.src = "template.png"; // Ganti dengan path gambar template
+        template.src = "template.png"; // Pastikan path benar
+        template.onload = function () {
+            console.log("Template loaded!");
+            ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
+        };
 
         function generateImage() {
-            const canvas = document.getElementById("outputCanvas");
-            const ctx = canvas.getContext("2d");
-            canvas.width = 750;
-            canvas.height = 1050;
+            // Bersihkan canvas sebelum menggambar ulang
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            template.onload = () => {
-                ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
+            // Cek apakah template sudah selesai dimuat
+            if (!template.complete) {
+                console.error("Template belum selesai dimuat!");
+                return;
+            }
 
-                // Ambil input
-                const title = document.getElementById("titleInput").value;
-                const desc = document.getElementById("descInput").value;
-                const imageInput = document.getElementById("imageInput").files[0];
+            // Gambar template
+            ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
 
-                // Tambahkan Title
-                ctx.font = "30px Arial";
-                ctx.fillStyle = "black";
-                ctx.textAlign = "center";
-                ctx.fillText(title, canvas.width / 2, 100);
+            // Ambil input teks
+            const title = document.getElementById("titleInput").value;
+            const desc = document.getElementById("descInput").value;
 
-                // Tambahkan Deskripsi
-                ctx.font = "20px Arial";
-                ctx.fillText(desc, canvas.width / 2, 900);
+            // Tambahkan teks ke canvas
+            ctx.font = "30px Arial";
+            ctx.fillStyle = "black";
+            ctx.textAlign = "center";
+            ctx.fillText(title, canvas.width / 2, 100);
 
-                // Tambahkan Gambar
-                if (imageInput) {
-                    const reader = new FileReader();
-                    reader.onload = function (e) {
-                        const img = new Image();
-                        img.src = e.target.result;
-                        img.onload = function () {
-                            ctx.drawImage(img, 275, 375, 200, 200); // Sesuaikan posisi
-                        };
+            ctx.font = "20px Arial";
+            ctx.fillText(desc, canvas.width / 2, 900);
+
+            // Tambahkan gambar yang diunggah
+            const imageInput = document.getElementById("imageInput").files[0];
+            if (imageInput) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = function () {
+                        ctx.drawImage(img, 275, 375, 200, 200); // Sesuaikan posisi
                     };
-                    reader.readAsDataURL(imageInput);
-                }
-            };
+                };
+                reader.readAsDataURL(imageInput);
+            }
         }
 
         function downloadImage() {
-            const canvas = document.getElementById("outputCanvas");
             const link = document.createElement("a");
             link.download = "hasil.png";
             link.href = canvas.toDataURL();
