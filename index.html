@@ -12,15 +12,32 @@
         canvas {
             border: 1px solid #000;
             max-width: 100%;
+            display: none;
+        }
+        #generatedImage {
+            max-width: 100%;
+            display: none;
+        }
+        #downloadLink {
+            display: none;
+            font-size: 18px;
+            text-decoration: none;
+            background: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            display: inline-block;
         }
     </style>
 </head>
 <body>
 
-    <h2>Template Gambar</h2>
+    <h2>Hasil Template Gambar</h2>
     <canvas id="outputCanvas"></canvas>
-    <br><br>
-    <button onclick="downloadImage()">Download</button>
+    <img id="generatedImage">
+    <br>
+    <a id="downloadLink" download="hasil.png">Download Gambar</a>
 
     <script>
         function getQueryParam(param) {
@@ -35,44 +52,51 @@
             canvas.height = 1050;
 
             const template = new Image();
-            template.src = "template.png"; // Pastikan template.png tersedia
+            template.src = "template.png"; // Pastikan file ada
             template.onload = function () {
                 ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
 
-                // Ambil data dari URL parameter
                 const title = getQueryParam("judul") || "Judul Default";
                 const desc = getQueryParam("desc") || "Deskripsi Default";
                 const imgUrl = getQueryParam("img");
 
-                // Tambahkan judul
                 ctx.font = "30px Arial";
                 ctx.fillStyle = "black";
                 ctx.textAlign = "center";
                 ctx.fillText(title, canvas.width / 2, 100);
 
-                // Tambahkan deskripsi
                 ctx.font = "20px Arial";
                 ctx.fillText(desc, canvas.width / 2, 900);
 
-                // Tambahkan gambar jika ada
                 if (imgUrl) {
                     const img = new Image();
-                    img.crossOrigin = "Anonymous"; // Agar bisa didownload tanpa masalah
+                    img.crossOrigin = "Anonymous";
                     img.src = imgUrl;
                     img.onload = function () {
-                        ctx.drawImage(img, 275, 375, 200, 200); // Sesuaikan posisi
+                        ctx.drawImage(img, 275, 375, 200, 200);
+
+                        // Convert canvas ke URL gambar
+                        const generatedImage = canvas.toDataURL("image/png");
+                        document.getElementById("generatedImage").src = generatedImage;
+                        document.getElementById("generatedImage").style.display = "block";
+                        document.getElementById("downloadLink").href = generatedImage;
+                        document.getElementById("downloadLink").style.display = "inline-block";
+
+                        // Simpan URL ke window agar bisa diambil oleh bot
+                        window.generatedImageURL = generatedImage;
                     };
+                } else {
+                    // Jika tidak ada gambar, tetap simpan URL gambar tanpa avatar
+                    const generatedImage = canvas.toDataURL("image/png");
+                    document.getElementById("generatedImage").src = generatedImage;
+                    document.getElementById("generatedImage").style.display = "block";
+                    document.getElementById("downloadLink").href = generatedImage;
+                    document.getElementById("downloadLink").style.display = "inline-block";
+
+                    window.generatedImageURL = generatedImage;
                 }
             };
         };
-
-        function downloadImage() {
-            const canvas = document.getElementById("outputCanvas");
-            const link = document.createElement("a");
-            link.download = "hasil.png";
-            link.href = canvas.toDataURL();
-            link.click();
-        }
     </script>
 
 </body>
