@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Template Gambar</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        canvas {
+            border: 1px solid #000;
+            max-width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Masukkan Data</h2>
+    <label>Judul:</label><br>
+    <input type="text" id="titleInput"><br><br>
+
+    <label>Unggah Gambar (1:1):</label><br>
+    <input type="file" id="imageInput" accept="image/*"><br><br>
+
+    <label>Deskripsi:</label><br>
+    <textarea id="descInput"></textarea><br><br>
+
+    <button onclick="generateImage()">Tampilkan</button>
+    <button onclick="downloadImage()">Download</button>
+
+    <br><br>
+    <canvas id="outputCanvas"></canvas>
+
+    <script>
+        const template = new Image();
+        template.src = "template.png"; // Ganti dengan path gambar template
+
+        function generateImage() {
+            const canvas = document.getElementById("outputCanvas");
+            const ctx = canvas.getContext("2d");
+            canvas.width = 750;
+            canvas.height = 1050;
+
+            template.onload = () => {
+                ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
+
+                // Ambil input
+                const title = document.getElementById("titleInput").value;
+                const desc = document.getElementById("descInput").value;
+                const imageInput = document.getElementById("imageInput").files[0];
+
+                // Tambahkan Title
+                ctx.font = "30px Arial";
+                ctx.fillStyle = "black";
+                ctx.textAlign = "center";
+                ctx.fillText(title, canvas.width / 2, 100);
+
+                // Tambahkan Deskripsi
+                ctx.font = "20px Arial";
+                ctx.fillText(desc, canvas.width / 2, 900);
+
+                // Tambahkan Gambar
+                if (imageInput) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        const img = new Image();
+                        img.src = e.target.result;
+                        img.onload = function () {
+                            ctx.drawImage(img, 275, 375, 200, 200); // Sesuaikan posisi
+                        };
+                    };
+                    reader.readAsDataURL(imageInput);
+                }
+            };
+        }
+
+        function downloadImage() {
+            const canvas = document.getElementById("outputCanvas");
+            const link = document.createElement("a");
+            link.download = "hasil.png";
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+    </script>
+
+</body>
+</html>
