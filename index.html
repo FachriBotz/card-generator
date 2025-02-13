@@ -17,77 +17,57 @@
 </head>
 <body>
 
-    <h2>Masukkan Data</h2>
-    <label>Judul:</label><br>
-    <input type="text" id="titleInput"><br><br>
-
-    <label>Unggah Gambar (1:1):</label><br>
-    <input type="file" id="imageInput" accept="image/*"><br><br>
-
-    <label>Deskripsi:</label><br>
-    <textarea id="descInput"></textarea><br><br>
-
-    <button onclick="generateImage()">Tampilkan</button>
+    <h2>Template Gambar</h2>
+    <canvas id="outputCanvas"></canvas>
+    <br><br>
     <button onclick="downloadImage()">Download</button>
 
-    <br><br>
-    <canvas id="outputCanvas"></canvas>
-
     <script>
-        const canvas = document.getElementById("outputCanvas");
-        const ctx = canvas.getContext("2d");
-        canvas.width = 750;
-        canvas.height = 1050;
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
 
-        const template = new Image();
-        template.src = "template.png"; // Pastikan path benar
-        template.onload = function () {
-            console.log("Template loaded!");
-            ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
-        };
+        window.onload = function() {
+            const canvas = document.getElementById("outputCanvas");
+            const ctx = canvas.getContext("2d");
+            canvas.width = 750;
+            canvas.height = 1050;
 
-        function generateImage() {
-            // Bersihkan canvas sebelum menggambar ulang
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const template = new Image();
+            template.src = "template.png"; // Pastikan template.png tersedia
+            template.onload = function () {
+                ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
 
-            // Cek apakah template sudah selesai dimuat
-            if (!template.complete) {
-                console.error("Template belum selesai dimuat!");
-                return;
-            }
+                // Ambil data dari URL parameter
+                const title = getQueryParam("judul") || "Judul Default";
+                const desc = getQueryParam("desc") || "Deskripsi Default";
+                const imgUrl = getQueryParam("img");
 
-            // Gambar template
-            ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
+                // Tambahkan judul
+                ctx.font = "30px Arial";
+                ctx.fillStyle = "black";
+                ctx.textAlign = "center";
+                ctx.fillText(title, canvas.width / 2, 100);
 
-            // Ambil input teks
-            const title = document.getElementById("titleInput").value;
-            const desc = document.getElementById("descInput").value;
+                // Tambahkan deskripsi
+                ctx.font = "20px Arial";
+                ctx.fillText(desc, canvas.width / 2, 900);
 
-            // Tambahkan teks ke canvas
-            ctx.font = "30px Arial";
-            ctx.fillStyle = "black";
-            ctx.textAlign = "center";
-            ctx.fillText(title, canvas.width / 2, 100);
-
-            ctx.font = "20px Arial";
-            ctx.fillText(desc, canvas.width / 2, 900);
-
-            // Tambahkan gambar yang diunggah
-            const imageInput = document.getElementById("imageInput").files[0];
-            if (imageInput) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
+                // Tambahkan gambar jika ada
+                if (imgUrl) {
                     const img = new Image();
-                    img.src = e.target.result;
+                    img.crossOrigin = "Anonymous"; // Agar bisa didownload tanpa masalah
+                    img.src = imgUrl;
                     img.onload = function () {
                         ctx.drawImage(img, 275, 375, 200, 200); // Sesuaikan posisi
                     };
-                };
-                reader.readAsDataURL(imageInput);
-            }
-        }
+                }
+            };
+        };
 
         function downloadImage() {
+            const canvas = document.getElementById("outputCanvas");
             const link = document.createElement("a");
             link.download = "hasil.png";
             link.href = canvas.toDataURL();
