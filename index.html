@@ -3,101 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Template Gambar</title>
+    <title>Card Identity</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-        }
-        canvas {
-            border: 1px solid #000;
-            max-width: 100%;
-            display: none;
-        }
-        #generatedImage {
-            max-width: 100%;
-            display: none;
-        }
-        #downloadLink {
-            display: none;
-            font-size: 18px;
-            text-decoration: none;
-            background: #007bff;
-            color: white;
-            padding: 10px 15px;
-            border-radius: 5px;
-            margin-top: 10px;
-            display: inline-block;
-        }
+        body { text-align: center; font-family: Arial, sans-serif; }
+        .card { width: 400px; padding: 20px; border: 2px solid #000; margin: auto; }
+        h2 { margin: 0; }
     </style>
 </head>
 <body>
-
-    <h2>Hasil Template Gambar</h2>
-    <canvas id="outputCanvas"></canvas>
-    <img id="generatedImage">
-    <br>
-    <a id="downloadLink" download="hasil.png">Download Gambar</a>
-
+    <div class="card">
+        <h2 id="name">Nama: [Nama]</h2>
+        <p id="age">Umur: [Umur]</p>
+        <p id="role">Jabatan: [Jabatan]</p>
+    </div>
     <script>
-        function getQueryParam(param) {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get(param);
-        }
-
-        window.onload = function() {
-            const canvas = document.getElementById("outputCanvas");
-            const ctx = canvas.getContext("2d");
-            canvas.width = 750;
-            canvas.height = 1050;
-
-            const template = new Image();
-            template.src = "template.png"; // Pastikan file ada
-            template.onload = function () {
-                ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
-
-                const title = getQueryParam("judul") || "Judul Default";
-                const desc = getQueryParam("desc") || "Deskripsi Default";
-                const imgUrl = getQueryParam("img");
-
-                ctx.font = "30px Arial";
-                ctx.fillStyle = "black";
-                ctx.textAlign = "center";
-                ctx.fillText(title, canvas.width / 2, 100);
-
-                ctx.font = "20px Arial";
-                ctx.fillText(desc, canvas.width / 2, 900);
-
-                if (imgUrl) {
-                    const img = new Image();
-                    img.crossOrigin = "Anonymous";
-                    img.src = imgUrl;
-                    img.onload = function () {
-                        ctx.drawImage(img, 275, 375, 200, 200);
-
-                        // Convert canvas ke URL gambar
-                        const generatedImage = canvas.toDataURL("image/png");
-                        document.getElementById("generatedImage").src = generatedImage;
-                        document.getElementById("generatedImage").style.display = "block";
-                        document.getElementById("downloadLink").href = generatedImage;
-                        document.getElementById("downloadLink").style.display = "inline-block";
-
-                        // Simpan URL ke window agar bisa diambil oleh bot
-                        window.generatedImageURL = generatedImage;
-                    };
-                } else {
-                    // Jika tidak ada gambar, tetap simpan URL gambar tanpa avatar
-                    const generatedImage = canvas.toDataURL("image/png");
-                    document.getElementById("generatedImage").src = generatedImage;
-                    document.getElementById("generatedImage").style.display = "block";
-                    document.getElementById("downloadLink").href = generatedImage;
-                    document.getElementById("downloadLink").style.display = "inline-block";
-
-                    window.generatedImageURL = generatedImage;
-                }
-            };
-        };
+        const params = new URLSearchParams(window.location.search);
+        document.getElementById("name").textContent = "Nama: " + params.get("nama");
+        document.getElementById("age").textContent = "Umur: " + params.get("umur");
+        document.getElementById("role").textContent = "Jabatan: " + params.get("jabatan");
     </script>
-
 </body>
 </html>
